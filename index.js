@@ -20,6 +20,6 @@ export function leaveBreadcrumb(name, metadata={}) {
 export default {
   notify,
   setUser,
-  removeUser,
+  clearUser,
   leaveBreadcrumb,
 };
