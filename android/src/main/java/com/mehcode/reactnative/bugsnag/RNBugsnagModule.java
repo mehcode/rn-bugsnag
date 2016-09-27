@@ -51,18 +51,10 @@ class RNBugsnagModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void notifyWithMessage(final String message, final String reason, final Promise promise) {
-        final Activity activity = getCurrentActivity();
-        if (activity == null) return;
+        Error error = new Error(message + reason);
+        Bugsnag.notify(error, Severity.ERROR, new MetaData());
 
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Error error = new Error(message + reason);
-                Bugsnag.notify(error, Severity.ERROR, new MetaData());
-
-                promise.resolve(null);
-            }
-        });
+        promise.resolve(null);
     }
 
     @ReactMethod
