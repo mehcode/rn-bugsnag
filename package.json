@@ -1,6 +1,6 @@
 {
   "name": "rn-bugsnag",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Configure and drive Bugsnag from JavaScript (for react-native). ",
   "main": "index.js",
   "repository": {
