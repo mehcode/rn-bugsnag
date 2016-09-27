@@ -1,4 +1,4 @@
-package com.mehcode.reactnative.notification;
+package com.mehcode.reactnative.bugsnag;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;

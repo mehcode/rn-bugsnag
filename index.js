@@ -9,8 +9,8 @@ export function setUser(userID, userName, userEmail="") {
   return RNBugsnag.setUser(userID, userName, userEmail);
 }
 
-export function removeUser() {
-  return RNBugsnag.setUser(null, null, null);
+export function clearUser() {
+  return RNBugsnag.clearUser();
 }
 
 export function leaveBreadcrumb(name, metadata={}) {

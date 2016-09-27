@@ -1,129 +1,91 @@
-package com.mehcode.reactnative.notification;
+package com.mehcode.reactnative.bugsnag;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.Bundle;
-import android.support.v7.app.NotificationCompat;
 
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.Callback;
-import com.facebook.react.bridge.LifecycleEventListener;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.ReadableNativeMap;
-import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.facebook.react.bridge.ReadableMapKeySetIterator;
+import com.facebook.react.bridge.ReadableType;
 
-import java.util.Date;
+import java.lang.Error;
+import java.util.HashMap;
+import java.util.Map;
 
-class NotificationModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
-    Activity mActivity = null;
+import com.bugsnag.android.*;
 
-    IntentFilter mIntentFilter = new IntentFilter(NotificationEventReceiver.INTENT_ID);
-    BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Bundle extras = intent.getExtras();
-
-            // Focus the application
-            String packageName = context.getApplicationContext().getPackageName();
-            Intent focusIntent = context.getPackageManager().getLaunchIntentForPackage(packageName).cloneFilter();
-
-            focusIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-
-            final Activity activity = getActivity();
-            if (activity != null) {
-                activity.startActivity(focusIntent);
-            }
-
-            // Send event to JS
-            WritableMap params = Arguments.createMap();
-            params.putInt("id", extras.getInt(NotificationEventReceiver.NOTIFICATION_ID));
-            params.putString("payload", extras.getString(NotificationEventReceiver.PAYLOAD));
-
-            getReactApplicationContext()
-                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                    .emit("RNNotification:press", params);
-
-            this.setResultCode(Activity.RESULT_OK);
-        }
-    };
-
-    public NotificationModule(ReactApplicationContext reactContext) {
+class RNBugsnagModule extends ReactContextBaseJavaModule {
+    public RNBugsnagModule(ReactApplicationContext reactContext) {
         super(reactContext);
 
-        reactContext.addLifecycleEventListener(this);
-        reactContext.registerReceiver(mIntentReceiver, mIntentFilter);
+        // Initialize Bugnsang (sets up crash handling)
+        Bugsnag.init(reactContext);
+
+        // Ensure we only notify in production (configurable?)
+        Bugsnag.setNotifyReleaseStages("production");
     }
 
     @Override
     public String getName() {
-        return "RNNotification";
+        return "RNBugsnag";
     }
 
-    // Gets the press event that spawned the application, if any
     @ReactMethod
-    public void getInitialNotificationPress(Callback cb) {
-        final Activity activity = getActivity();
+    public void setUser(
+            String userID, String userName,
+            String userEmail, Promise promise) {
+        Bugsnag.setUser(userID, userEmail, userName);
+
+        promise.resolve(null);
+    }
+
+    @ReactMethod
+    public void clearUser(Promise promise) {
+        // BUG: This isn't static for some reason
+        Bugsnag.getClient().clearUser();
+
+        promise.resolve(null);
+    }
+
+    @ReactMethod
+    public void notifyWithMessage(final String message, final String reason, final Promise promise) {
+        final Activity activity = getCurrentActivity();
         if (activity == null) return;
 
-        Intent intent = activity.getIntent();
-        Bundle extras = intent.getExtras();
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Error error = new Error(message + reason);
+                Bugsnag.notify(error, Severity.ERROR, new MetaData());
 
-        if (extras != null) {
-            int initialNotificationId = extras.getInt("RNNotification:initialId", 0);
-            if (initialNotificationId != 0) {
-                WritableMap params = Arguments.createMap();
-                params.putInt("id", initialNotificationId);
-                params.putString("payload", extras.getString("RNNotification:initialPayload"));
-
-                cb.invoke(params);
-                return;
+                promise.resolve(null);
             }
-        }
+        });
     }
 
     @ReactMethod
-    public void create(ReadableMap options, ReadableMap payload) {
-        NotificationAttributes attributes = NotificationAttributes.fromReadableMap(options);
+    public void leaveBreadcrumb(String name, ReadableMap metadata, Promise promise) {
+        // Convert ReadableMap to HashMap
+        Map<String, String> md = new HashMap<String, String>();
+        ReadableMapKeySetIterator iterator = metadata.keySetIterator();
+        while (iterator.hasNextKey()) {
+            String key = iterator.nextKey();
+            ReadableType type = metadata.getType(key);
+            switch (type) {
+                case String:
+                    md.put(key, metadata.getString(key));
+                    break;
 
-        Notification notification = new Notification(
-                getReactApplicationContext(),
+                default:
+                    // Do nothing
+                    break;
+            }
+        }
 
-                // Unique ID for notification
-                // TODO: Allow specification of this ID
-                (int)((new Date().getTime() / 1000L) % Integer.MAX_VALUE),
+        Bugsnag.leaveBreadcrumb(name, BreadcrumbType.NAVIGATION, md);
 
-                // Attributes
-                attributes
-        );
-
-        notification.show();
-    }
-
-    Activity getActivity() {
-        Activity activity = getCurrentActivity();
-        if (activity == null) activity = mActivity;
-
-        return activity;
-    }
-
-    @Override
-    public void onHostResume() {
-        mActivity = getCurrentActivity();
-    }
-
-    @Override
-    public void onHostPause() {
-        mActivity = getCurrentActivity();
-    }
-
-    @Override
-    public void onHostDestroy() {
+        promise.resolve(null);
     }
 }
