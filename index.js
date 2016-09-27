@@ -2,7 +2,7 @@ import {NativeModules} from "react-native";
 const {RNBugsnag} = NativeModules;
 
 export function notify(errorMessage, errorReason) {
-  return RNBugsnag.notify(errorMessage, errorReason);
+  return RNBugsnag.notifyWithMessage(errorMessage, errorReason);
 }
 
 export function setUser(userID, userName, userEmail="") {
@@ -14,7 +14,7 @@ export function removeUser() {
 }
 
 export function leaveBreadcrumb(name, metadata={}) {
-  return RNBugsnag.setUser(name, metadata);
+  return RNBugsnag.leaveBreadcrumb(name, metadata);
 }
 
 export default {
