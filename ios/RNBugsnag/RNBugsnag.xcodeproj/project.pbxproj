@@ -223,11 +223,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DEVELOPMENT_TEAM = B45CT23BDX;
+				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"${SRCROOT}/../../react-native/React/**",
-					"${SRCROOT}/../../node_modules/react-native/React/**",
-					"$(PROJECT_DIR)/../../../ios/**",
+					"${SRCROOT}/../../../../ios/**",
+					"${SRCROOT}/../../../react-native/React/**",
+					"${SRCROOT}/../../../node_modules/react-native/React/**",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -239,11 +240,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DEVELOPMENT_TEAM = B45CT23BDX;
+				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"${SRCROOT}/../../react-native/React/**",
-					"${SRCROOT}/../../node_modules/react-native/React/**",
-					"$(PROJECT_DIR)/../../../ios/**",
+					"${SRCROOT}/../../../../ios/**",
+					"${SRCROOT}/../../../react-native/React/**",
+					"${SRCROOT}/../../../node_modules/react-native/React/**",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -270,6 +272,7 @@
 				76C26DEA1D99EE74005AF5EF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

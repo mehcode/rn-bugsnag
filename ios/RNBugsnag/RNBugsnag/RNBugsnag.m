@@ -10,8 +10,8 @@
     dispatch_once(&onceToken, ^{
         NSString* bugsnagAPIKey = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"BUGSNAG_API_KEY"];
         
-//        [Bugsnag configuration].notifyReleaseStages = @[@"production"];
-        [Bugsnag startBugsnagWithApiKey:bugsnagID];
+        //        [Bugsnag configuration].notifyReleaseStages = @[@"production"];
+        [Bugsnag startBugsnagWithApiKey:bugsnagAPIKey];
     });
 }
 
@@ -20,7 +20,7 @@ RCT_EXPORT_METHOD(notifyWithMessage:(NSString *) message
                   reason:(NSString *) reason
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
-    [Bugsnag notify:[NSException exceptionWithName:message reason:reason]];
+    [Bugsnag notify:[NSException exceptionWithName:message reason:reason userInfo:nil]];
     
     resolve([NSNull null]);
 }
@@ -34,7 +34,7 @@ RCT_EXPORT_METHOD(setUser:(NSString *_Nullable) userID
     [[Bugsnag configuration] setUser:userID
                             withName:userName
                             andEmail:userEmail];
-
+    
     resolve([NSNull null]);
 }
 
