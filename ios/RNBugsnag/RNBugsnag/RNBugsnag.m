@@ -1,7 +1,7 @@
 #import "RNBugsnag.h"
 #import "RCTBridge.h"
 #import "RCTEventDispatcher.h"
-#import <Bugsnag/Bugsnag.h>
+#import <Bugsnag.h>
 
 @implementation RNBugsnag
 
