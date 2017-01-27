@@ -1,6 +1,6 @@
 #import "RNBugsnag.h"
-#import "RCTBridge.h"
-#import "RCTEventDispatcher.h"
+#import <React/RCTBridge.h>
+#import <React/RCTEventDispatcher.h>
 #import <Bugsnag.h>
 
 @implementation RNBugsnag
