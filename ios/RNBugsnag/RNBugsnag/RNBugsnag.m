@@ -10,6 +10,12 @@
     dispatch_once(&onceToken, ^{
         NSString* bugsnagAPIKey = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"BUGSNAG_API_KEY"];
 
+#ifdef DEBUG
+        [Bugsnag configuration].releaseStage = @"development";
+#else
+        [Bugsnag configuration].releaseStage = @"production";
+#endif
+        
         [Bugsnag configuration].notifyReleaseStages = @[@"production"];
         [Bugsnag startBugsnagWithApiKey:bugsnagAPIKey];
     });
